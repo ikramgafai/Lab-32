@@ -8,27 +8,29 @@ import org.springframework.cloud.gateway.discovery.DiscoveryLocatorProperties;
 import org.springframework.context.annotation.Bean;
 
 /**
- * Main application class for the API Gateway service.
+ * Main application entry point for the API Gateway microservice.
  * 
- * <p>This Spring Boot application serves as the API Gateway in the microservices
- * architecture, acting as the single entry point for all client requests. It routes
- * incoming requests to appropriate microservices using service discovery and provides
- * dynamic routing capabilities.</p>
+ * <p>This Spring Boot application implements the API Gateway pattern within the
+ * microservices architecture, functioning as the centralized entry point for all
+ * external client requests. The gateway dynamically routes incoming requests to
+ * appropriate backend microservices using service discovery mechanisms and provides
+ * sophisticated routing capabilities with load balancing support.</p>
  * 
- * <p>The gateway provides:
+ * <p>The gateway implementation provides comprehensive capabilities:
  * <ul>
- *   <li>Centralized request routing to backend microservices</li>
- *   <li>Dynamic service discovery integration with Eureka</li>
- *   <li>Load balancing across service instances</li>
- *   <li>Request/response transformation capabilities</li>
- *   <li>Cross-cutting concerns (logging, monitoring, security)</li>
+ *   <li>Unified request routing to distributed microservices</li>
+ *   <li>Automatic service discovery integration with Eureka server</li>
+ *   <li>Intelligent load balancing across multiple service instances</li>
+ *   <li>Request and response transformation capabilities</li>
+ *   <li>Centralized cross-cutting concerns including logging, monitoring, and security</li>
  * </ul></p>
  * 
- * <p>The gateway uses Spring Cloud Gateway, which is built on Spring WebFlux and
- * provides reactive, non-blocking request handling for high performance.</p>
+ * <p>The gateway is built on Spring Cloud Gateway technology, which leverages
+ * Spring WebFlux for reactive, non-blocking request processing, enabling high
+ * throughput and efficient resource utilization under concurrent load conditions.</p>
  * 
  * @author Ikram Gafai
- * @version 2.0
+ * @version 3.0
  * @since 2024
  * @see org.springframework.boot.autoconfigure.SpringBootApplication
  * @see org.springframework.cloud.gateway.discovery.DiscoveryClientRouteDefinitionLocator
@@ -37,45 +39,50 @@ import org.springframework.context.annotation.Bean;
 public class ApiGatewayApplication {
 
     /**
-     * Main entry point for the API Gateway application.
+     * Application bootstrap method that initializes and launches the API Gateway.
      * 
-     * <p>This method initializes the Spring Boot application context and starts
-     * the gateway server. The gateway will register with Eureka and begin routing
-     * requests to registered microservices based on the service discovery configuration.</p>
+     * <p>This method serves as the main entry point for the gateway application,
+     * initializing the Spring Boot application context and starting the embedded
+     * web server. Upon startup, the gateway automatically registers with the Eureka
+     * discovery server and begins routing incoming requests to registered microservices
+     * based on the configured service discovery settings.</p>
      * 
-     * <p>The gateway runs on port 8888 by default and routes requests to services
-     * registered with the Eureka discovery server.</p>
+     * <p>The gateway server runs on port 8888 by default and maintains active
+     * connections with services registered in the Eureka service registry, enabling
+     * dynamic request routing without manual configuration updates.</p>
      * 
-     * @param applicationArguments Command line arguments passed to the application
+     * @param args Command line arguments passed to the application during startup
      */
-    public static void main(String[] applicationArguments) {
-        SpringApplication.run(ApiGatewayApplication.class, applicationArguments);
+    public static void main(String[] args) {
+        SpringApplication.run(ApiGatewayApplication.class, args);
     }
 
     /**
-     * Configures dynamic route discovery using Eureka service registry.
+     * Configures and registers a bean for dynamic route discovery via Eureka service registry.
      * 
-     * <p>This bean enables automatic route creation for services registered with Eureka,
-     * eliminating the need for manual route configuration. Routes are dynamically created
-     * based on service names registered in the Eureka server.</p>
+     * <p>This Spring bean configuration enables automatic route generation for all services
+     * registered with the Eureka discovery server, eliminating the necessity for manual
+     * route configuration. Routes are dynamically created and maintained based on service
+     * names discovered in the Eureka service registry, ensuring that the gateway can route
+     * to all available microservices without requiring code changes or restarts.</p>
      * 
-     * <p>The locator automatically:
+     * <p>The route locator performs the following operations automatically:
      * <ul>
-     *   <li>Discovers services from Eureka registry</li>
-     *   <li>Creates routes for each discovered service</li>
-     *   <li>Updates routes when services are added or removed</li>
-     *   <li>Handles service instance selection and load balancing</li>
+     *   <li>Discovers all available services from the Eureka service registry</li>
+     *   <li>Creates HTTP routes for each discovered service instance</li>
+     *   <li>Dynamically updates routes when services are registered or deregistered</li>
+     *   <li>Performs intelligent service instance selection and load balancing</li>
      * </ul></p>
      * 
-     * @param reactiveDiscoveryClient Reactive client for service discovery operations
-     * @param discoveryLocatorProperties Configuration properties for the discovery locator
-     * @return Configured DiscoveryClientRouteDefinitionLocator for dynamic routing
+     * @param discoveryClient Reactive discovery client for service registry interactions
+     * @param locatorProps Configuration properties defining discovery locator behavior
+     * @return Fully configured DiscoveryClientRouteDefinitionLocator instance for dynamic routing
      */
     @Bean
     DiscoveryClientRouteDefinitionLocator dynamicRouteLocator(
-            ReactiveDiscoveryClient reactiveDiscoveryClient,
-            DiscoveryLocatorProperties discoveryLocatorProperties) {
-        return new DiscoveryClientRouteDefinitionLocator(reactiveDiscoveryClient, discoveryLocatorProperties);
+            ReactiveDiscoveryClient discoveryClient,
+            DiscoveryLocatorProperties locatorProps) {
+        return new DiscoveryClientRouteDefinitionLocator(discoveryClient, locatorProps);
     }
 }
 
