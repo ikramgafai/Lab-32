@@ -7,17 +7,19 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * Response model for Vehicle data with associated Customer information.
+ * Response model aggregating vehicle and customer data for API responses.
  * 
- * <p>This model combines vehicle details with customer data to provide a comprehensive
- * response to API consumers. It serves as the primary data structure returned by
- * the Vehicle Management Service endpoints.</p>
+ * <p>This model class combines vehicle-specific attributes with associated
+ * customer information to deliver comprehensive response payloads to API consumers.
+ * It functions as the primary response structure for all vehicle management
+ * service endpoints that require enriched vehicle data.</p>
  * 
- * <p>The model uses the Builder pattern (via Lombok) to facilitate easy construction
- * of response objects with various combinations of vehicle and customer data.</p>
+ * <p>The class leverages the Builder design pattern through Lombok annotations
+ * to enable flexible object construction with various attribute combinations,
+ * supporting complex response scenarios while maintaining code clarity.</p>
  * 
  * @author Ikram Gafai
- * @version 2.0
+ * @version 3.0
  * @since 2024
  * @see com.igafai.vehicle.entities.VehicleEntity
  * @see com.igafai.vehicle.entities.CustomerDataTransferObject
@@ -29,40 +31,49 @@ import lombok.NoArgsConstructor;
 public class VehicleResponseModel {
 
     /**
-     * Unique identifier of the vehicle.
+     * Primary key identifier uniquely identifying the vehicle record.
      * 
-     * <p>This identifier matches the vehicle's primary key in the database
-     * and can be used for subsequent API calls to retrieve or update vehicle information.</p>
+     * <p>This identifier corresponds directly to the vehicle entity's primary key
+     * in the persistence layer and can be utilized in subsequent API invocations
+     * to perform vehicle-specific operations such as retrieval, updates, or deletion.</p>
      */
     private Long vehicleId;
 
     /**
-     * Brand or manufacturer name of the vehicle.
+     * Manufacturing brand name associated with the vehicle.
      * 
-     * <p>Represents the company that manufactured the vehicle (e.g., Toyota, BMW, Mercedes).</p>
+     * <p>This attribute represents the corporate brand responsible for vehicle
+     * production. Common examples include global automotive manufacturers such
+     * as Toyota, BMW, Mercedes-Benz, and similar established brands.</p>
      */
     private String manufacturerBrand;
 
     /**
-     * Model name or designation of the vehicle.
+     * Product model designation identifying the vehicle variant.
      * 
-     * <p>Represents the specific model within the manufacturer's product line.</p>
+     * <p>This field specifies the particular model name or designation within
+     * the manufacturer's product portfolio, enabling distinction between different
+     * vehicle variants produced under the same brand umbrella.</p>
      */
     private String vehicleModel;
 
     /**
-     * Registration number or license plate identifier.
+     * Official registration or license plate number assigned to the vehicle.
      * 
-     * <p>Unique identifier assigned by the registration authority for legal identification.</p>
+     * <p>This unique identifier is issued by governmental registration authorities
+     * and serves as the legal identification marker for vehicle registration,
+     * regulatory compliance, and administrative tracking purposes.</p>
      */
     private String registrationPlateNumber;
 
     /**
-     * Complete customer information associated with this vehicle.
+     * Customer entity information linked to this vehicle's ownership.
      * 
-     * <p>This object contains the customer details retrieved from the Customer Management Service.
-     * It includes customer identifier, full name, and age. This field may be null if the
-     * associated customer cannot be found or retrieved.</p>
+     * <p>This nested object encapsulates customer details obtained through
+     * inter-service communication with the customer management microservice.
+     * The object includes customer identifier, full name, and age attributes.
+     * This field may be null if the associated customer record cannot be
+     * located or retrieved due to service unavailability or data inconsistencies.</p>
      * 
      * @see com.igafai.vehicle.entities.CustomerDataTransferObject
      */
