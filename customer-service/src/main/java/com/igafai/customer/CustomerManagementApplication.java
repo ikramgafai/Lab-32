@@ -38,37 +38,40 @@ import org.springframework.context.annotation.Bean;
 public class CustomerManagementApplication {
 
     /**
-     * Main entry point for the Customer Management Service application.
+     * Application bootstrap method that initializes and launches the Customer Management Service.
      * 
-     * <p>This method initializes the Spring Boot application context and starts
-     * the embedded web server. The application will register with Eureka and
-     * begin accepting HTTP requests on the configured port.</p>
+     * <p>This method serves as the main entry point for the customer management microservice,
+     * initializing the Spring Boot application context and starting the embedded web server.
+     * Upon startup, the application automatically registers with the Eureka service registry
+     * and begins accepting HTTP requests on the configured port for customer management operations.</p>
      * 
-     * @param applicationArguments Command line arguments passed to the application
+     * @param args Command line arguments passed to the application during startup
      */
-    public static void main(String[] applicationArguments) {
-        SpringApplication.run(CustomerManagementApplication.class, applicationArguments);
+    public static void main(String[] args) {
+        SpringApplication.run(CustomerManagementApplication.class, args);
     }
 
     /**
-     * Initializes the database with sample customer data for development and testing.
+     * Configures application startup initialization with sample customer data.
      * 
-     * <p>This bean runs at application startup to populate the database with initial
-     * customer records. The sample data includes three customers with different names
-     * and ages, providing a foundation for testing and development purposes.</p>
+     * <p>This Spring bean executes during application bootstrap to seed the
+     * database with initial customer records for development and integration
+     * testing scenarios. The initialization creates three sample customer
+     * entities with varied demographic attributes.</p>
      * 
-     * <p>Note: In production environments, this initialization should be disabled or
-     * replaced with proper data migration scripts.</p>
+     * <p>Production deployments should disable this initialization mechanism
+     * and utilize formal database migration tooling (e.g., Flyway, Liquibase)
+     * for controlled data provisioning and version management.</p>
      * 
-     * @param customerDataRepository Repository for customer data access operations
-     * @return CommandLineRunner that initializes sample customer data
+     * @param repo Repository instance for performing customer persistence operations
+     * @return CommandLineRunner implementation that executes the data initialization logic
      */
     @Bean
-    CommandLineRunner initializeDatabaseWithSampleData(CustomerDataRepository customerDataRepository) {
-        return applicationArguments -> {
-            customerDataRepository.save(new CustomerEntity(1L, "Amine SAFI", 23.0f));
-            customerDataRepository.save(new CustomerEntity(2L, "Amal ALAOUI", 22.0f));
-            customerDataRepository.save(new CustomerEntity(3L, "Samir RAMI", 22.0f));
+    CommandLineRunner initializeDatabaseWithSampleData(CustomerDataRepository repo) {
+        return args -> {
+            repo.save(new CustomerEntity(1L, "Amine SAFI", 23.0f));
+            repo.save(new CustomerEntity(2L, "Amal ALAOUI", 22.0f));
+            repo.save(new CustomerEntity(3L, "Samir RAMI", 22.0f));
         };
     }
 }
