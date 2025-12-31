@@ -8,18 +8,21 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 /**
- * Service class for managing Customer business logic and operations.
+ * Business service layer implementation for customer domain operations.
  * 
- * <p>This service handles all customer-related business operations including retrieval,
- * creation, and data management. It acts as the intermediary between the controller
- * layer and the data access layer, implementing business rules and validation logic.</p>
+ * <p>This service class encapsulates all business logic and orchestration
+ * related to customer management within the customer microservice. It serves
+ * as the primary abstraction between the presentation layer (controllers)
+ * and the data persistence layer (repositories), enforcing business rules
+ * and maintaining transactional boundaries.</p>
  * 
- * <p>The service provides methods for querying customer data, creating new customer
- * records, and managing customer information. It ensures data consistency and implements
- * business logic that should not be exposed at the repository level.</p>
+ * <p>The service implements operations for customer lifecycle management
+ * including query operations, entity creation, and domain-specific business
+ * validations. It ensures data integrity and consistency across customer
+ * operations while providing a clean API for the controller layer.</p>
  * 
  * @author Ikram Gafai
- * @version 2.0
+ * @version 3.0
  * @since 2024
  * @see com.igafai.customer.repositories.CustomerDataRepository
  * @see com.igafai.customer.controllers.CustomerManagementController
@@ -28,56 +31,65 @@ import java.util.List;
 public class CustomerManagementService {
 
     /**
-     * Repository for customer data access operations.
+     * Data repository for customer entity persistence operations.
+     * 
+     * <p>Injected dependency providing database access capabilities
+     * for customer entities. This repository handles all CRUD operations
+     * and custom query executions.</p>
      */
     @Autowired
-    private CustomerDataRepository customerDataRepository;
+    private CustomerDataRepository repository;
 
     /**
-     * Retrieves all customers from the database.
+     * Creates and persists a new customer record in the system.
      * 
-     * <p>This method fetches all customer records stored in the system.
-     * It returns a complete list of customers without any filtering or pagination.
-     * For production systems, consider implementing pagination for large datasets.</p>
+     * <p>This method accepts a customer entity and persists it to the database.
+     * The system automatically generates a unique identifier if the entity
+     * doesn't already contain one. The method includes basic persistence logic
+     * and returns the fully populated entity including any generated fields.</p>
      * 
-     * @return List of all CustomerEntity objects in the database
+     * <p>Future enhancements should include comprehensive validation rules
+     * such as age constraints, name format validation, and duplicate detection
+     * to ensure data quality and business rule compliance.</p>
+     * 
+     * @param entity The customer entity instance to persist
+     * @return The persisted entity with all generated and computed fields populated
+     */
+    public CustomerEntity createNewCustomer(CustomerEntity entity) {
+        return repository.save(entity);
+    }
+
+    /**
+     * Retrieves all customer records from the persistence store.
+     * 
+     * <p>This operation fetches every customer entity currently stored in
+     * the database without applying any filtering, sorting, or pagination.
+     * In production environments with large datasets, this method should
+     * be enhanced with pagination support to prevent performance degradation
+     * and excessive memory consumption.</p>
+     * 
+     * @return Complete collection of all customer entities in the system
      */
     public List<CustomerEntity> retrieveAllCustomers() {
-        return customerDataRepository.findAll();
+        return repository.findAll();
     }
 
     /**
-     * Retrieves a specific customer by their unique identifier.
+     * Locates and retrieves a single customer entity by its unique identifier.
      * 
-     * <p>This method fetches a single customer record using the provided identifier.
-     * If the customer is not found, an exception is thrown to indicate the invalid
-     * identifier.</p>
+     * <p>This method performs a primary key lookup to find a specific customer
+     * record. If no matching record exists for the provided identifier, the
+     * method throws an exception to signal the lookup failure, enabling the
+     * calling layer to handle the error condition appropriately.</p>
      * 
-     * @param customerIdentifier The unique identifier of the customer to retrieve
-     * @return CustomerEntity object if found
-     * @throws IllegalArgumentException if the customer identifier is invalid or not found
+     * @param id The unique numeric identifier of the target customer
+     * @return The customer entity matching the provided identifier
+     * @throws IllegalArgumentException if no customer exists with the specified identifier
      */
-    public CustomerEntity retrieveCustomerById(Long customerIdentifier) throws IllegalArgumentException {
-        return customerDataRepository.findById(customerIdentifier)
+    public CustomerEntity retrieveCustomerById(Long id) throws IllegalArgumentException {
+        return repository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException(
-                    "Customer not found with identifier: " + customerIdentifier));
-    }
-
-    /**
-     * Creates a new customer record in the database.
-     * 
-     * <p>This method persists a new customer entity to the database. The customer
-     * identifier will be automatically generated if not provided. The method performs
-     * basic validation and saves the customer entity.</p>
-     * 
-     * <p>Note: Additional business validation (e.g., age restrictions, name format)
-     * should be implemented here or in a separate validation layer.</p>
-     * 
-     * @param customerEntity The customer entity to be persisted
-     * @return The saved CustomerEntity with generated identifier
-     */
-    public CustomerEntity createNewCustomer(CustomerEntity customerEntity) {
-        return customerDataRepository.save(customerEntity);
+                    "Customer not found with identifier: " + id));
     }
 }
 

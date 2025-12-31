@@ -5,23 +5,30 @@ import com.igafai.customer.services.CustomerManagementService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
 /**
- * REST Controller for Customer management API endpoints.
+ * RESTful web service controller exposing customer management HTTP endpoints.
  * 
- * <p>This controller provides HTTP endpoints for managing customer information.
- * It follows RESTful principles and integrates with the Customer Management Service
- * to handle business logic and data operations.</p>
+ * <p>This controller class defines the REST API interface for customer-related
+ * operations within the customer management microservice. It adheres to REST
+ * architectural principles and provides standardized HTTP method mappings for
+ * customer resource manipulation.</p>
  * 
- * <p>All endpoints are prefixed with "/api/customer" and return JSON responses.
- * The controller handles HTTP requests, validates input, and delegates business
- * operations to the service layer.</p>
+ * <p>All API endpoints are namespace-scoped under the "/api/customer" base path
+ * and produce/consume JSON payloads. The controller coordinates between HTTP
+ * request handling and business service layer operations, ensuring proper
+ * request validation and response formatting.</p>
  * 
  * @author Ikram Gafai
- * @version 2.0
+ * @version 3.0
  * @since 2024
  * @see com.igafai.customer.services.CustomerManagementService
  * @see org.springframework.web.bind.annotation.RestController
@@ -31,70 +38,101 @@ import java.util.List;
 public class CustomerManagementController {
 
     /**
-     * Service for customer business logic operations.
+     * Business service component for customer domain operations.
+     * 
+     * <p>Dependency-injected service instance that encapsulates all business
+     * logic and data access coordination for customer management operations.</p>
      */
     @Autowired
-    private CustomerManagementService customerManagementService;
+    private CustomerManagementService service;
 
     /**
-     * Retrieves all customers from the database.
+     * Handles HTTP POST requests to create new customer resources.
      * 
-     * <p>This endpoint returns a complete list of all customers in the system.
-     * The response includes customer identifier, full name, and age for each customer.</p>
+     * <p>This endpoint processes customer creation requests by accepting a
+     * JSON-serialized customer entity in the request body. The system
+     * automatically generates a unique identifier if not provided, then
+     * persists the entity and returns the complete persisted record.</p>
      * 
-     * <p>HTTP Method: GET
-     * <br>Endpoint: /api/customer
-     * <br>Response: 200 OK with list of customers</p>
+     * <p>Request Specification:
+     * <ul>
+     *   <li>Method: POST</li>
+     *   <li>Path: /api/customer</li>
+     *   <li>Content-Type: application/json</li>
+     *   <li>Request Body: CustomerEntity JSON representation</li>
+     * </ul></p>
      * 
-     * @return ResponseEntity containing a list of CustomerEntity objects
+     * <p>Response Specification:
+     * <ul>
+     *   <li>Status: 201 Created</li>
+     *   <li>Body: Complete CustomerEntity with generated identifier</li>
+     * </ul></p>
+     * 
+     * @param entity The customer entity to persist, deserialized from request body
+     * @return HTTP response entity containing the created customer record
+     */
+    @PostMapping
+    public ResponseEntity<CustomerEntity> createCustomer(@RequestBody CustomerEntity entity) {
+        CustomerEntity created = service.createNewCustomer(entity);
+        return ResponseEntity.status(HttpStatus.CREATED).body(created);
+    }
+
+    /**
+     * Handles HTTP GET requests to retrieve a specific customer by identifier.
+     * 
+     * <p>This endpoint performs a lookup operation for a single customer record
+     * using the identifier provided as a path variable. The endpoint returns
+     * the complete customer details including all associated attributes.</p>
+     * 
+     * <p>Request Specification:
+     * <ul>
+     *   <li>Method: GET</li>
+     *   <li>Path: /api/customer/{id}</li>
+     *   <li>Path Variable: id (Long) - Customer unique identifier</li>
+     * </ul></p>
+     * 
+     * <p>Response Specification:
+     * <ul>
+     *   <li>Status: 200 OK (success) or 400 Bad Request (not found)</li>
+     *   <li>Body: CustomerEntity object or error details</li>
+     * </ul></p>
+     * 
+     * @param id The unique numeric identifier of the customer to retrieve
+     * @return HTTP response entity containing the customer record
+     * @throws IllegalArgumentException if the specified customer identifier is invalid
+     */
+    @GetMapping("/{id}")
+    public ResponseEntity<CustomerEntity> getCustomerById(@PathVariable("id") Long id) 
+            throws IllegalArgumentException {
+        CustomerEntity result = service.retrieveCustomerById(id);
+        return ResponseEntity.status(HttpStatus.OK).body(result);
+    }
+
+    /**
+     * Handles HTTP GET requests to retrieve all customer resources.
+     * 
+     * <p>This endpoint returns a complete collection of all customer entities
+     * currently stored in the system. The response includes all customer
+     * attributes for each record: identifier, name, and age.</p>
+     * 
+     * <p>Request Specification:
+     * <ul>
+     *   <li>Method: GET</li>
+     *   <li>Path: /api/customer</li>
+     * </ul></p>
+     * 
+     * <p>Response Specification:
+     * <ul>
+     *   <li>Status: 200 OK</li>
+     *   <li>Body: Array of CustomerEntity objects</li>
+     * </ul></p>
+     * 
+     * @return HTTP response entity containing a collection of all customer entities
      */
     @GetMapping
     public ResponseEntity<List<CustomerEntity>> getAllCustomers() {
-        List<CustomerEntity> customerList = customerManagementService.retrieveAllCustomers();
-        return ResponseEntity.status(HttpStatus.OK).body(customerList);
-    }
-
-    /**
-     * Retrieves a specific customer by their unique identifier.
-     * 
-     * <p>This endpoint returns a single customer record identified by the path variable.
-     * The response includes complete customer details including identifier, full name, and age.</p>
-     * 
-     * <p>HTTP Method: GET
-     * <br>Endpoint: /api/customer/{customerId}
-     * <br>Response: 200 OK with customer data, or 400 Bad Request if customer not found</p>
-     * 
-     * @param customerId The unique identifier of the customer to retrieve
-     * @return ResponseEntity containing the CustomerEntity object
-     * @throws IllegalArgumentException if the customer identifier is invalid or not found
-     */
-    @GetMapping("/{customerId}")
-    public ResponseEntity<CustomerEntity> getCustomerById(
-            @PathVariable("customerId") Long customerId) throws IllegalArgumentException {
-        
-        CustomerEntity customerEntity = customerManagementService.retrieveCustomerById(customerId);
-        return ResponseEntity.status(HttpStatus.OK).body(customerEntity);
-    }
-
-    /**
-     * Creates a new customer in the database.
-     * 
-     * <p>This endpoint accepts a customer object in the request body and persists it
-     * to the database. The customer identifier will be automatically generated if not
-     * provided in the request.</p>
-     * 
-     * <p>HTTP Method: POST
-     * <br>Endpoint: /api/customer
-     * <br>Request Body: CustomerEntity object (JSON)
-     * <br>Response: 201 Created with the saved customer data</p>
-     * 
-     * @param customerEntity The customer entity to be created
-     * @return ResponseEntity containing the created CustomerEntity with generated identifier
-     */
-    @PostMapping
-    public ResponseEntity<CustomerEntity> createCustomer(@RequestBody CustomerEntity customerEntity) {
-        CustomerEntity savedCustomer = customerManagementService.createNewCustomer(customerEntity);
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedCustomer);
+        List<CustomerEntity> customers = service.retrieveAllCustomers();
+        return ResponseEntity.status(HttpStatus.OK).body(customers);
     }
 }
 
