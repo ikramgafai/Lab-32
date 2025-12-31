@@ -10,17 +10,19 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Repository interface for Vehicle entity data access operations.
+ * Data access repository interface for vehicle entity persistence operations.
  * 
- * <p>This repository extends Spring Data JPA's JpaRepository to provide standard CRUD operations
- * and custom query methods for Vehicle entities. It abstracts the database access layer
- * and provides a clean interface for the service layer.</p>
+ * <p>This repository interface extends Spring Data JPA's JpaRepository to inherit
+ * standard CRUD operations and transaction management capabilities for vehicle entities.
+ * It provides a clean abstraction layer that isolates business logic from database
+ * implementation specifics and query execution details.</p>
  * 
- * <p>The repository follows Spring Data JPA conventions, allowing for automatic query
- * generation based on method names. Custom queries can be added using @Query annotations.</p>
+ * <p>The repository adheres to Spring Data JPA naming conventions for automatic
+ * query method generation while also supporting custom JPQL queries via @Query
+ * annotations for specialized data retrieval requirements.</p>
  * 
  * @author Ikram Gafai
- * @version 2.0
+ * @version 3.0
  * @since 2024
  * @see org.springframework.data.jpa.repository.JpaRepository
  * @see com.igafai.vehicle.entities.VehicleEntity
@@ -29,26 +31,29 @@ import java.util.Optional;
 public interface VehicleDataRepository extends JpaRepository<VehicleEntity, Long> {
 
     /**
-     * Finds all vehicles associated with a specific customer.
+     * Locates all vehicle records linked to a specific customer identifier.
      * 
-     * <p>This method retrieves all vehicle records that belong to the customer
-     * identified by the provided customer identifier.</p>
+     * <p>This query method retrieves every vehicle entity where the customer
+     * identifier matches the provided parameter, enabling the identification
+     * of all vehicles owned by a particular customer within the system.</p>
      * 
-     * @param customerIdentifier The unique identifier of the customer
-     * @return List of VehicleEntity objects associated with the customer
+     * @param id The unique numeric identifier of the target customer
+     * @return Collection of vehicle entities associated with the specified customer
      */
-    @Query("SELECT vehicle FROM vehicles vehicle WHERE vehicle.ownerCustomerIdentifier = :customerId")
-    List<VehicleEntity> findByCustomerIdentifier(@Param("customerId") Long customerIdentifier);
+    @Query("SELECT v FROM vehicles v WHERE v.customerId = :id")
+    List<VehicleEntity> findByCustomerIdentifier(@Param("id") Long id);
 
     /**
-     * Finds a vehicle by its registration plate number.
+     * Performs vehicle lookup using registration number as the search key.
      * 
-     * <p>This method provides an alternative lookup mechanism using the unique
-     * registration number instead of the primary key.</p>
+     * <p>This method provides an alternative vehicle retrieval mechanism that
+     * utilizes the unique registration number instead of the primary key identifier.
+     * The method returns an Optional to handle cases where no matching vehicle
+     * exists for the provided registration number.</p>
      * 
      * @param registrationNumber The registration plate number to search for
-     * @return Optional containing the VehicleEntity if found, empty otherwise
+     * @return Optional wrapper containing the VehicleEntity if a match is found, empty otherwise
      */
-    Optional<VehicleEntity> findByRegistrationPlateNumber(String registrationNumber);
+    Optional<VehicleEntity> findByRegistrationNumber(String registrationNumber);
 }
 
