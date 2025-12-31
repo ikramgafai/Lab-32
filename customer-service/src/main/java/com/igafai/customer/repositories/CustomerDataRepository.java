@@ -7,21 +7,21 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
- * Repository interface for Customer entity data access operations.
+ * Data access repository interface for customer persistence operations.
  * 
- * <p>This repository extends Spring Data JPA's JpaRepository to provide standard CRUD operations
- * and custom query methods for Customer entities. It abstracts the database access layer
- * and provides a clean interface for the service layer.</p>
+ * <p>This repository interface extends Spring Data JPA's JpaRepository
+ * to inherit standard CRUD operations and transaction management capabilities.
+ * It provides a data access abstraction layer that decouples business logic
+ * from database implementation details.</p>
  * 
- * <p>The repository follows Spring Data JPA conventions, allowing for automatic query
- * generation based on method names. Custom queries can be added using @Query annotations
- * for complex operations.</p>
+ * <p>The repository leverages Spring Data JPA's method name conventions
+ * for automatic query generation, while also supporting custom JPQL queries
+ * via @Query annotations for complex data retrieval scenarios.</p>
  * 
  * @author Ikram Gafai
- * @version 2.0
+ * @version 3.0
  * @since 2024
  * @see org.springframework.data.jpa.repository.JpaRepository
  * @see com.igafai.customer.entities.CustomerEntity
@@ -30,28 +30,31 @@ import java.util.Optional;
 public interface CustomerDataRepository extends JpaRepository<CustomerEntity, Long> {
 
     /**
-     * Finds customers by their full name (case-insensitive partial match).
+     * Performs case-insensitive partial matching search on customer names.
      * 
-     * <p>This method performs a case-insensitive search for customers whose
-     * full name contains the provided search term.</p>
+     * <p>This query method searches for customer records where the name field
+     * contains the specified search string, regardless of character case.
+     * The search pattern matches any occurrence of the search term within
+     * the customer name field.</p>
      * 
-     * @param nameSearchTerm The name or part of name to search for
-     * @return List of CustomerEntity objects matching the search criteria
+     * @param searchTerm The text fragment to search for within customer names
+     * @return Collection of customer entities matching the name criteria
      */
-    @Query("SELECT customer FROM customers customer WHERE LOWER(customer.customerFullName) LIKE LOWER(CONCAT('%', :name, '%'))")
-    List<CustomerEntity> findByFullNameContainingIgnoreCase(@Param("name") String nameSearchTerm);
+    @Query("SELECT c FROM customers c WHERE LOWER(c.name) LIKE LOWER(CONCAT('%', :searchTerm, '%'))")
+    List<CustomerEntity> findByFullNameContainingIgnoreCase(@Param("searchTerm") String searchTerm);
 
     /**
-     * Finds customers within a specific age range.
+     * Retrieves customers whose age falls within a specified numeric range.
      * 
-     * <p>This method retrieves all customers whose age falls within the specified
-     * minimum and maximum values (inclusive).</p>
+     * <p>This method performs an inclusive range query to find all customers
+     * whose age value is greater than or equal to the minimum parameter and
+     * less than or equal to the maximum parameter.</p>
      * 
-     * @param minimumAge The minimum age (inclusive)
-     * @param maximumAge The maximum age (inclusive)
-     * @return List of CustomerEntity objects within the age range
+     * @param lowerBound The minimum age threshold (inclusive)
+     * @param upperBound The maximum age threshold (inclusive)
+     * @return Collection of customer entities within the specified age range
      */
-    @Query("SELECT customer FROM customers customer WHERE customer.customerAge BETWEEN :minAge AND :maxAge")
-    List<CustomerEntity> findByAgeBetween(@Param("minAge") Float minimumAge, @Param("maxAge") Float maximumAge);
+    @Query("SELECT c FROM customers c WHERE c.age BETWEEN :lowerBound AND :upperBound")
+    List<CustomerEntity> findByAgeBetween(@Param("lowerBound") Float lowerBound, @Param("upperBound") Float upperBound);
 }
 

@@ -1,31 +1,33 @@
 package com.igafai.customer.entities;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.Column;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * Entity class representing a Customer in the microservices architecture.
+ * Represents a customer entity in the distributed microservices system.
  * 
- * <p>This entity stores customer information including personal details such as
- * full name and age. The customer entity is managed by the Customer Management
- * Service and serves as the source of truth for customer data across the system.</p>
+ * <p>This JPA entity class defines the customer data model that persists
+ * customer information within the customer management domain. It encapsulates
+ * customer identity details and serves as the authoritative data source
+ * for customer records in the enterprise microservices ecosystem.</p>
  * 
- * <p>The entity uses JPA annotations for persistence and Lombok annotations
- * for reducing boilerplate code. The primary key is auto-generated using
- * database identity strategy.</p>
+ * <p>The entity leverages Jakarta Persistence API for database mapping
+ * and utilizes Lombok annotations to minimize boilerplate code generation.
+ * Primary key generation follows the IDENTITY strategy for optimal
+ * database performance and consistency.</p>
  * 
- * <p>This entity is referenced by other microservices (such as Vehicle Management)
- * through service-to-service communication rather than direct database access,
- * maintaining service boundaries in the microservices architecture.</p>
+ * <p>Cross-service references utilize inter-service API communication
+ * patterns rather than direct database joins, preserving microservice
+ * autonomy and enabling independent service deployment cycles.</p>
  * 
  * @author Ikram Gafai
- * @version 2.0
+ * @version 3.0
  * @since 2024
  * @see jakarta.persistence.Entity
  * @see com.igafai.customer.repositories.CustomerDataRepository
@@ -37,36 +39,46 @@ import lombok.NoArgsConstructor;
 public class CustomerEntity {
 
     /**
-     * Unique identifier for the customer record.
+     * Primary key identifier uniquely identifying each customer record.
      * 
-     * <p>This field serves as the primary key and is automatically generated
-     * by the database using the IDENTITY strategy. Each customer instance
-     * will have a unique identifier assigned upon persistence.</p>
+     * <p>This numeric identifier is automatically assigned by the database
+     * engine upon entity persistence. The IDENTITY generation strategy ensures
+     * uniqueness and sequential allocation without requiring additional
+     * database queries or synchronization mechanisms.</p>
+     * 
+     * <p>The identifier serves as the foreign key reference point for
+     * dependent entities in other bounded contexts within the microservices
+     * architecture.</p>
      */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "customer_id", nullable = false, unique = true)
-    private Long customerIdentifier;
+    private Long id;
 
     /**
-     * Complete legal name of the customer.
+     * Full legal name of the customer as per official documentation.
      * 
-     * <p>This field contains the full name as registered in the system.
-     * The format may include first name, middle name(s), and last name.
-     * The name is stored as a single string to accommodate various naming conventions.</p>
+     * <p>This attribute stores the complete name string, potentially
+     * encompassing given names, middle names, and family names in a
+     * single field to accommodate diverse international naming conventions
+     * and cultural naming patterns.</p>
+     * 
+     * <p>The field is mandatory and subject to length constraints
+     * to ensure data quality and storage optimization.</p>
      */
     @Column(name = "full_name", nullable = false, length = 255)
-    private String customerFullName;
+    private String name;
 
     /**
-     * Age of the customer in years.
+     * Current age of the customer measured in years as a decimal value.
      * 
-     * <p>This field represents the customer's age at the time of record creation.
-     * It is stored as a floating-point number to allow for precise age calculations
-     * and demographic analysis. The age is used for business logic validation
-     * and reporting purposes.</p>
+     * <p>The floating-point representation enables precise age tracking
+     * including fractional years when necessary. This value typically
+     * represents age at the point of record creation and can be used
+     * for demographic analysis, business rule enforcement, and
+     * regulatory compliance verification.</p>
      */
     @Column(name = "age", nullable = false)
-    private Float customerAge;
+    private Float age;
 }
 
