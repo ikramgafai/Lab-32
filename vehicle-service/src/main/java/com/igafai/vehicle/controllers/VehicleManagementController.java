@@ -13,18 +13,20 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 /**
- * REST Controller for Vehicle management API endpoints.
+ * RESTful web service controller exposing vehicle management HTTP endpoints.
  * 
- * <p>This controller provides HTTP endpoints for retrieving vehicle information
- * with associated customer data. It follows RESTful principles and integrates
- * with the Vehicle Management Service to handle business logic.</p>
+ * <p>This controller class defines the REST API interface for vehicle-related
+ * operations within the vehicle management microservice. It adheres to REST
+ * architectural principles and provides standardized HTTP method mappings for
+ * vehicle resource retrieval with enriched customer information.</p>
  * 
- * <p>All endpoints are prefixed with "/api/vehicle" and return JSON responses.
- * The controller handles HTTP requests and delegates business operations to the
- * service layer.</p>
+ * <p>All API endpoints are namespace-scoped under the "/api/vehicle" base path
+ * and produce JSON payloads. The controller coordinates between HTTP request
+ * handling and business service layer operations, ensuring proper response
+ * formatting and error handling.</p>
  * 
  * @author Ikram Gafai
- * @version 2.0
+ * @version 3.0
  * @since 2024
  * @see com.igafai.vehicle.services.VehicleManagementService
  * @see org.springframework.web.bind.annotation.RestController
@@ -34,54 +36,73 @@ import java.util.List;
 public class VehicleManagementController {
 
     /**
-     * Service for vehicle business logic operations.
+     * Business service component for vehicle domain operations.
+     * 
+     * <p>Dependency-injected service instance that encapsulates all business
+     * logic, data aggregation, and cross-service integration for vehicle
+     * management operations.</p>
      */
     @Autowired
-    private VehicleManagementService vehicleManagementService;
+    private VehicleManagementService service;
 
     /**
-     * Retrieves all vehicles with their associated customer information.
+     * Handles HTTP GET requests to retrieve a specific vehicle with customer data by identifier.
      * 
-     * <p>This endpoint returns a complete list of all vehicles in the system,
-     * each enriched with customer data from the Customer Management Service.
-     * The response includes vehicle details (brand, model, registration) along
-     * with owner information (name, age).</p>
+     * <p>This endpoint performs a lookup operation for a single vehicle record
+     * using the identifier provided as a path variable. The response includes
+     * complete vehicle attributes along with associated customer information
+     * obtained through inter-service communication.</p>
      * 
-     * <p>HTTP Method: GET
-     * <br>Endpoint: /api/vehicle
-     * <br>Response: 200 OK with list of vehicles</p>
+     * <p>Request Specification:
+     * <ul>
+     *   <li>Method: GET</li>
+     *   <li>Path: /api/vehicle/{id}</li>
+     *   <li>Path Variable: id (Long) - Vehicle unique identifier</li>
+     * </ul></p>
      * 
-     * @return ResponseEntity containing a list of VehicleResponseModel objects
+     * <p>Response Specification:
+     * <ul>
+     *   <li>Status: 200 OK (success) or 400 Bad Request (not found)</li>
+     *   <li>Body: VehicleResponseModel object with vehicle and customer data</li>
+     * </ul></p>
+     * 
+     * @param id The unique numeric identifier of the vehicle to retrieve
+     * @return HTTP response entity containing the vehicle response model
+     * @throws IllegalArgumentException if the specified vehicle identifier is invalid
      */
-    @GetMapping
-    public ResponseEntity<List<VehicleResponseModel>> getAllVehiclesWithCustomerData() {
-        List<VehicleResponseModel> vehicleList = 
-            vehicleManagementService.retrieveAllVehiclesWithCustomerData();
-        return ResponseEntity.status(HttpStatus.OK).body(vehicleList);
+    @GetMapping("/{id}")
+    public ResponseEntity<VehicleResponseModel> getVehicleByIdWithCustomerData(
+            @PathVariable("id") Long id) throws IllegalArgumentException {
+        VehicleResponseModel result = service.retrieveVehicleByIdWithCustomerData(id);
+        return ResponseEntity.status(HttpStatus.OK).body(result);
     }
 
     /**
-     * Retrieves a specific vehicle by its identifier with associated customer information.
+     * Handles HTTP GET requests to retrieve all vehicles with enriched customer information.
      * 
-     * <p>This endpoint returns a single vehicle record identified by the path variable.
-     * The response includes complete vehicle details along with the associated customer
-     * information retrieved from the Customer Management Service.</p>
+     * <p>This endpoint returns a complete collection of all vehicle entities currently
+     * stored in the system, with each vehicle enriched with customer data retrieved
+     * from the customer management microservice. The response includes vehicle details
+     * (brand, model, registration number) along with owner information (name, age).</p>
      * 
-     * <p>HTTP Method: GET
-     * <br>Endpoint: /api/vehicle/{vehicleId}
-     * <br>Response: 200 OK with vehicle data, or 400 Bad Request if vehicle not found</p>
+     * <p>Request Specification:
+     * <ul>
+     *   <li>Method: GET</li>
+     *   <li>Path: /api/vehicle</li>
+     * </ul></p>
      * 
-     * @param vehicleId The unique identifier of the vehicle to retrieve
-     * @return ResponseEntity containing the VehicleResponseModel object
-     * @throws IllegalArgumentException if the vehicle identifier is invalid or not found
+     * <p>Response Specification:
+     * <ul>
+     *   <li>Status: 200 OK</li>
+     *   <li>Body: Array of VehicleResponseModel objects</li>
+     * </ul></p>
+     * 
+     * @return HTTP response entity containing a collection of vehicle response models
      */
-    @GetMapping("/{vehicleId}")
-    public ResponseEntity<VehicleResponseModel> getVehicleByIdWithCustomerData(
-            @PathVariable("vehicleId") Long vehicleId) throws IllegalArgumentException {
-        
-        VehicleResponseModel vehicleResponse = 
-            vehicleManagementService.retrieveVehicleByIdWithCustomerData(vehicleId);
-        return ResponseEntity.status(HttpStatus.OK).body(vehicleResponse);
+    @GetMapping
+    public ResponseEntity<List<VehicleResponseModel>> getAllVehiclesWithCustomerData() {
+        List<VehicleResponseModel> vehicles = service.retrieveAllVehiclesWithCustomerData();
+        return ResponseEntity.status(HttpStatus.OK).body(vehicles);
     }
 }
 

@@ -39,16 +39,17 @@ import org.springframework.web.client.RestTemplate;
 public class VehicleManagementApplication {
 
     /**
-     * Main entry point for the Vehicle Management Service application.
+     * Application bootstrap method that initializes and launches the Vehicle Management Service.
      * 
-     * <p>This method initializes the Spring Boot application context and starts
-     * the embedded web server. The application will register with Eureka and
-     * begin accepting HTTP requests on the configured port.</p>
+     * <p>This method serves as the main entry point for the vehicle management microservice,
+     * initializing the Spring Boot application context and starting the embedded web server.
+     * Upon startup, the application automatically registers with the Eureka service registry
+     * and begins accepting HTTP requests on the configured port for vehicle management operations.</p>
      * 
-     * @param applicationArguments Command line arguments passed to the application
+     * @param args Command line arguments passed to the application during startup
      */
-    public static void main(String[] applicationArguments) {
-        SpringApplication.run(VehicleManagementApplication.class, applicationArguments);
+    public static void main(String[] args) {
+        SpringApplication.run(VehicleManagementApplication.class, args);
     }
 
     /**

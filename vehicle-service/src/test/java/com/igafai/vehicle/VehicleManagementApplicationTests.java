@@ -1,23 +1,24 @@
 package com.igafai.vehicle;
 
-import com.igafai.vehicle.entities.VehicleEntity;
 import com.igafai.vehicle.repositories.VehicleDataRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 /**
- * Integration tests for the Vehicle Management Application.
+ * Integration test suite for the Vehicle Management Application.
  * 
- * <p>This test class verifies that the Spring Boot application context loads
- * successfully and that all required beans are properly configured. It serves
- * as a basic smoke test to ensure the application can start without errors.</p>
+ * <p>This test class performs integration testing to verify that the Spring Boot
+ * application context initializes correctly and that all required Spring beans
+ * are properly configured and available. It serves as a comprehensive smoke test
+ * to ensure the application can start successfully without configuration errors.</p>
  * 
- * <p>The tests use the @SpringBootTest annotation to load the complete
- * application context, including all configuration, beans, and dependencies.</p>
+ * <p>The test suite utilizes the @SpringBootTest annotation to load the complete
+ * application context, including all Spring configuration, bean definitions,
+ * and dependency injection wiring.</p>
  * 
  * @author Ikram Gafai
- * @version 2.0
+ * @version 3.0
  * @since 2024
  * @see org.springframework.boot.test.context.SpringBootTest
  */
@@ -25,24 +26,26 @@ import org.springframework.boot.test.context.SpringBootTest;
 class VehicleManagementApplicationTests {
 
     /**
-     * Repository for vehicle data access operations.
+     * Repository bean instance for validating dependency injection.
      * 
-     * <p>This field is autowired to verify that the repository bean is properly
-     * configured and available in the application context.</p>
+     * <p>This field is dependency-injected to verify that the repository bean
+     * is correctly configured, instantiated, and available within the Spring
+     * application context. Successful autowiring confirms proper bean configuration.</p>
      */
     @Autowired
-    private VehicleDataRepository vehicleDataRepository;
+    private VehicleDataRepository repository;
 
     /**
-     * Verifies that the application context loads successfully.
+     * Validates successful application context initialization and bean configuration.
      * 
-     * <p>This test ensures that all Spring beans are properly configured and
-     * that the application can start without errors. If this test passes, it
-     * indicates that the basic application setup is correct.</p>
+     * <p>This integration test verifies that all Spring beans are correctly configured
+     * and that the application context loads without exceptions. A passing test
+     * indicates that the fundamental application setup, including dependency injection,
+     * configuration loading, and bean initialization, is functioning correctly.</p>
      */
     @Test
     void verifyApplicationContextLoads() {
-        // Test passes if application context loads without exceptions
+        // Test assertion: Application context loads successfully if no exceptions are thrown
     }
 }
 
